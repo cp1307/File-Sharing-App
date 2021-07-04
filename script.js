@@ -1,11 +1,12 @@
 const connectDB = require('./config/db');
 const File = require('./models/file');
 const fs = require('fs');
+const cron = require('node-cron');
 
 connectDB();
 
 // Get all records older than 24 hours 
-async function fetchData() {
+cron.schedule('0 1 * * *',async function fetchData() {
     const files = await File.find({ createdAt : { $lt: new Date(Date.now() - 24 * 60 * 60 * 1000)} })
     if(files.length) {
         for (const file of files) {
@@ -19,6 +20,4 @@ async function fetchData() {
         }
     }
     console.log('Job done!');
-}
-
-fetchData().then(process.exit);
+});
